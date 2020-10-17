@@ -1,12 +1,23 @@
+body {
+    font-family: 'Jolly Lodger', cursive;
+}
+
 .node {
     position: absolute;
     z-index: 9;
     background-color: #d5f8ef;
     text-align: center;
-    border: 1px solid #00000086;
     cursor: move;
-  }
+}
 
-  button {
-      align-self: center;
-  }
+.selected {
+    border: 3px solid #f70000;
+    cursor: move;
+}
+
+.diagonal {
+    transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+}
