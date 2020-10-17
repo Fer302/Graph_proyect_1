@@ -56,9 +56,6 @@ for(var k=0;k<this.numVertices;k++){
 }*/
 var countnodes = 0
 var countedges = 0
-var draggable = document.getElementsByClassName("node"),
-        draggableCount = draggable.length, 
-        i;
 
 class node{
     constructor(){
@@ -86,19 +83,16 @@ function createnode(){
     btn.innerHTML = 'O'; 
     btn.classList.add("node");
     document.body.appendChild(btn);
-    draggable = document.getElementsByClassName("node"),
-        draggableCount = draggable.length, 
-        i;
 }
 
 (function (document) {
     'use strict';
     
     function startDrag(evt) {
-       
+        
         var diffX = evt.clientX - this.offsetLeft,
             diffY = evt.clientY - this.offsetTop,
-            that = this; 
+            that = this;
         
         function moveAlong(evt) {
             that.style.left = (evt.clientX - diffX) + 'px';
@@ -114,8 +108,12 @@ function createnode(){
         document.addEventListener('mousemove', moveAlong);
     }
     
-    for (i = 0; i < draggableCount; i += 1) {
-        draggable[i].addEventListener('mousedown', startDrag);
+    function startDragIfDraggable(evt) {
+        if (evt.target.classList.contains('node')) {
+            startDrag.call(evt.target, evt);
+        }
     }
-
+    
+    document.body.addEventListener('mousedown', startDragIfDraggable);
+    
 }(document));
