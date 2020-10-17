@@ -1,0 +1,12 @@
+.node {
+    position: absolute;
+    z-index: 9;
+    background-color: #d5f8ef;
+    text-align: center;
+    border: 1px solid #00000086;
+    cursor: move;
+  }
+
+  button {
+      align-self: center;
+  }
