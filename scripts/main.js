@@ -99,27 +99,23 @@ function createnode(){
     }
 }
 
-function createLine(x1, y1, x2, y2)
-	{
-		if (x2 < x1)
-		{
-			var temp = x1;
-			x1 = x2;
-			x2 = temp;
-			temp = y1;
-			y1 = y2;
-			y2 = temp;
-        }
-		var line = document.createElement("div");
-		line.className = "line";
-		var length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-		line.style.width = length + "px";
-        var angle = Math.atan((y2-y1)/(x2-x1));
-        line.style.top = y1 + 0.5*length*Math.sin(angle) + "px";
-        line.style.left = x1 - 0.5*length*(1 - Math.cos(angle)) + "px";
-        line.style.MozTransform = line.style.WebkitTransform = line.style.OTransform= "rotate(" + angle + "rad)";
-		return line;
-	}
+  function createLine(x1, y1, x2, y2){
+    var length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+    var angle  = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+    var transform = 'rotate('+angle+'deg)';
+      var line = $('<div>')
+        .appendTo('#page')
+        .addClass('line')
+        .css({
+          'position': 'absolute',
+          'transform': transform
+        })
+        .width(length)
+        .offset({left: x1, top: y1});
+        alert("here");
+  
+    return line;
+  }
 
 (function (document) {
     'use strict';
