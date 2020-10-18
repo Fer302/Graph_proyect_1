@@ -3,7 +3,7 @@ function bfs(rGraph,s,t,parent,nv){
     for(var i=0;i<nv;i++){
         visited[i]=false;
     }
-    q=[];
+    var q=[];
     q.push(s);
     visited[s]=true;
     parent[s]=-1;
@@ -39,7 +39,7 @@ function fordFulkerson(graph,s,t,nv){
             u=parent[v];
             path_flow=Math.min(path_flow,rGraph[u][v]);
         }
-        for(var v=t; v!=s;v=parent[v]){
+        for( v=t; v!=s;v=parent[v]){
             u=parent[v];
             rGraph[u][v]-=path_flow;
             rGraph[v][u]+=path_flow;
