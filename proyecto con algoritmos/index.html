@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <title>Aplicacion Grafoss</title>
+    <script src="claseg.js"></script>
+    <script src="flujo.js"></script>
+    <script src="d3.v3.min.js"></script>
+    <script src="visualizacion.js"></script>
+    <style>
+      .monospace {
+     font-family: "Lucida Console", Courier, monospace;
+     }
+
+      .node {
+          fill: #ccc;
+          stroke: #fff;
+          stroke-width: 2px;
+      }
+      /*add css for links*/
+      
+      .link {
+          stroke: #777;
+          stroke-width: 2px;
+      }
+      svg { position:absolute; 
+           top:315px; left:700px; 
+           background-color: AliceBlue;
+           }
+      hr{
+        border: 1px solid black;
+      }
+      h1{
+        background-color: rgb(0, 204, 255);
+        border : 1px solid black;
+        font-family:  monospace;
+      }
+      body{
+        background-color: rgb(0, 255, 157);
+        font-family:  Tahoma, Geneva, sans-serif;
+        border : 1px solid black;
+      }
+  
+  </style>
+    <script>
+        var gr;
+        var links=[];
+          function fn1() {
+            var num = parseInt(document.getElementById("text1").value);
+            gr = new grafo(num);
+            links=[];
+            fn3();
+            mostrarDirigido();
+
+          }
+          function fn2() {
+            var v1 = parseInt(document.getElementById("text2").value);
+            var v2 = parseInt(document.getElementById("text3").value);
+            var peso = parseInt(document.getElementById("text4").value);
+            gr.nueva_arista(v1, v2, peso);
+            var temp={source:v1,target:v2};
+            links.push(temp);
+            fn3();
+            mostrarVisual();
+          }
+          function fn4() {
+            gr.MatrizCamino();
+            if (gr.EsConexo() == true) {
+              document.getElementById("demo").innerHTML = " Es un grafo Conexo";
+            }
+            else {
+              document.getElementById("demo").innerHTML = " No es conexo";
+            }
+          }
+          function borrar() {
+            var b1 = parseInt(document.getElementById("text2").value);
+            var b1 = parseInt(document.getElementById("text2").value);
+            gr.borrar_arista(b1, b2);
+            fn3();
+          }
+          function DijkstraFinal() {
+            var n1 = parseInt(document.getElementById("textInicio").value);
+            var n2 = parseInt(document.getElementById("textTermino").value);
+            var dist = Dijkstra(gr.MatrizAdy, n1, gr.numVertices, n2);
+            document.getElementById("demo2").innerHTML = dist;
+
+          }
+          function eulerianoFinal() {
+            var MatrizAux = [];
+            for (var r = 0; r < gr.numVertices; r++) {
+              MatrizAux[r] = new Array(gr.numVertices);
+            }
+            for (var x = 0; x < gr.numVertices; x++) {
+              for (var y = 0; y < gr.numVertices; y++) {
+                MatrizAux[x][y] = gr.MatrizBinaria[x][y];
+              }
+            }
+            var CaminoEuler = findpath(MatrizAux,gr.numVertices);
+            document.getElementById("demoEuler").innerHTML = CaminoEuler;
+          }
+          function AgregarDirigido(){
+            var v1 = parseInt(document.getElementById("Vertice1D").value);
+            var v2 = parseInt(document.getElementById("Vertice2D").value);
+            var peso = parseInt(document.getElementById("PesoD").value);
+            gr.arista_dirigido(v1,v2,peso);
+            mostrarDirigido();
+            console.log(gr.Dirigido[v1][v2]);
+
+          }
+          function flujoMaximo(){
+            var tempS = parseInt(document.getElementById("nSource").value);
+            var tempT = parseInt(document.getElementById("nTarget").value);
+            var flujoTemp=fordFulkerson(gr.Dirigido,tempS,tempT,gr.numVertices);
+            document.getElementById("demoFlujo").innerHTML = 'El flujo maximo es '+ flujoTemp;
+          }
+    </script>
+    <style>
+      canvas{
+        border : 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Aplicacion Grafos No dirigido</h1>
+      <input id="text1" size="10" ; placeholder="Numero Vertices">
+      <button onclick="fn1()" id="btn1">Inicializar Grafo
+      </button>
+      <br><br>
+      <button onclick="mostrarVisual()" id="btnVisual">Mostrar Visualizacion</button><br><hr>
+      <script>
+        // set a width and height for our SVG
+        var width = 600, height = 400;
+         // add a SVG to the body for our viz
+        var svg=d3.select('body').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr("style", "outline: thin solid black;");
+
+      </script>
+    </div>
+      <label for="edge">Añadir o borrar arista: </label>
+      <input id="text2" size="5" placeholder="vertice 1"><input id="text3" size="5" placeholder="vertice 2"><input id="text4"
+        size="5" placeholder="peso">
+      <button onclick="fn2()" id="btn2">Añadir</button>
+      <button onclick="borrar()" id="btnB">Borrar</button><br>
+      <hr>
+      <label for="btn4">Comprobar si es grafo conexo </label>
+      <button onclick="fn4()" id="btn4">Comprobar</button><label id="demo"></label><br>
+      <hr>
+      <label>Camino mas corto y distancia : </label>
+      <input id="textInicio" size="8" placeholder="Nodo Inicio"><input id="textTermino" size="8" placeholder="Nodo Termino">
+      <button onclick="DijkstraFinal()" id="btnC">Mostrar</button><label id="demo2"> </label><br>
+      <hr>
+      <label>Comprobar si es euleriano y su camino : </label>
+      <button onclick="eulerianoFinal()" id="btnE">Ejecutar</button><label id="demoEuler"> </label><br>
+      <hr>
+      
+      <canvas id="c1"></canvas>
+      <script>
+          var canvas = document.getElementById('c1');
+          canvas.width = 400;
+          canvas.height = 400;
+          function fn3() {
+            var c = canvas.getContext('2d');
+            c.clearRect(0, 0, canvas.width, canvas.height);
+            var nver = gr.numVertices;
+            var xz = 400 / (nver * 2);
+            for (var i = 0; i < nver; i++) {
+              for (var j = 0; j < nver; j++) {
+                var x = i * (400 / nver);
+                var y = j * (400 / nver);
+                c.beginPath();
+                c.lineWidth = "1";
+                c.strokeStyle = "black";
+                c.fillStyle = "black";
+                var str1 = xz.toString();
+                var str2 = "px Arial";
+                var fonts = str1.concat(str2);
+                c.font = fonts;
+                c.fillText(gr.MatrizBinaria[i][j], x, y + (400 / nver));
+                c.rect(x, y, (400 / nver), (400 / nver));
+                c.stroke();
+              }
+            }
+          }
+      </script>
+      <button onclick="fn3()" id="btn3">Mostrar Matriz Grafo</button><br><hr>
+      <h1>Para grafo Dirigido</h1><br>
+      <label >Añadir o borrar arista: </label>
+      <input id="Vertice1D" size="5" placeholder="vertice 1"><input id="Vertice2D" size="5" placeholder="vertice 2"><input id="PesoD"
+        size="5" placeholder="peso">
+      <button onclick="AgregarDirigido()" id="btnU">Añadir</button><br><hr>
+      <label>Comprobar el flujo Maximo </label>
+      <input id="nSource" size="8" placeholder="Nodo Inicio"><input id="nTarget" size="8" placeholder="Nodo Termino">
+      <button onclick="flujoMaximo()" id="btnFlujo"> Ejecutar</button>
+      <label id="demoFlujo"> </label>
+        <br>
+      <canvas id="c2"></canvas>
+      <script>
+          var canvas2 = document.getElementById('c2');
+          canvas2.width = 400;
+          canvas2.height = 400;
+          function mostrarDirigido() {
+            var ctx = canvas2.getContext('2d');
+            ctx.clearRect(0, 0, canvas2.width, canvas2.height);
+            var nver = gr.numVertices;
+            var xz = 400 / (nver * 2);
+            for (var i = 0; i < nver; i++) {
+              for (var j = 0; j < nver; j++) {
+                var x = i * (400 / nver);
+                var y = j * (400 / nver);
+                ctx.beginPath();
+                ctx.lineWidth = "1";
+                ctx.strokeStyle = "black";
+                ctx.fillStyle = "black";
+                var str1 = xz.toString();
+                var str2 = "px Arial";
+                var fonts = str1.concat(str2);
+                ctx.font = fonts;
+                ctx.fillText(gr.Dirigido[j][i], x, y + (400 / nver));
+                ctx.rect(x, y, (400 / nver), (400 / nver));
+                ctx.stroke();
+              }
+            }
+          }
+
+      </script>
+            <button onclick="mostrarDirigido()" id="btnDirigidoo">Mostrar Matriz Grafo Dirigido</button><br><br>
+
+      
+      
+    
+
+      
+        
+  
+  </body>
+</html>
