@@ -65,7 +65,7 @@ class node{
     constructor(){
         this.id = countnodes;
         countnodes++;
-        this.edges= [];
+        this.edges= []; //Edges
     }
 }
 
@@ -75,13 +75,14 @@ class edge{
         countedges++;
         this.weight = W;
         this.dir = D;//0= sin direccion, 1=1->2
-        this.nodes = [n1, n2]
+        this.nodes = [n1, n2] //Node IDs
     }
 }
 
-var nodearray= []
-var edgearray= []
-var first
+var nodearray = []
+var edgearray = []
+var first // Node
+var nodespassed = [] 
 
 function check(){
     if(!document.getElementById("add").checked){
@@ -112,7 +113,7 @@ function showedges(){
         else
             arrow = " -- ";
         document.getElementById("owtheedge").innerHTML +=
-            edgearray[i].nodes[0] + arrow + edgearray[i].nodes[1] + " (" + edgearray[i].weight + ")       ";
+            "  [" + edgearray[i].nodes[0] + arrow + edgearray[i].nodes[1] + " (" + edgearray[i].weight + ")]      ";
     }
 }
 
@@ -160,10 +161,23 @@ function createnode(){
         var dir = false;
         if(document.getElementById("dir").checked)
             dir = true;
-        edgearray.push(new edge(node1.id, node2.id, 0, dir));
+        edgearray.push(new edge(node1.id, node2.id, weight, dir));
         showedges();
+        nodearray[node1.id].edges.push(edgearray[countedges-1]);
+        nodearray[node2.id].edges.push(edgearray[countedges-1]);
         node1.classList.remove("selected");
         node2.classList.remove("selected");
+    }
+
+    function addedgeself(){
+        var nodes = document.getElementsByClassName("selected2")[0];
+        var dir = false;
+        if(document.getElementById("dir").checked)
+            dir = true;
+        edgearray.push(new edge(nodes.id, nodes.id, weight, dir));
+        showedges();
+        nodearray[nodes.id].edges.push(edgearray[countedges-1]);
+        nodes.classList.remove("selected2");
     }
 
     function startDragIfDraggable(evt) {
@@ -171,12 +185,16 @@ function createnode(){
             startDrag.call(evt.target, evt);
         }
         else if(evt.target.classList.contains('node')&&document.getElementById("add").checked) {
-            if(evt.target.classList.contains('selected'))
+            if(evt.target.classList.contains('selected')){
                 evt.target.classList.remove("selected");
+                evt.target.classList.add("selected2");
+            }
             else
                 evt.target.classList.add("selected");
             if(document.getElementsByClassName("selected").length==2)
                 addedge();
+            else if(document.getElementsByClassName("selected2").length==1)
+                addedgeself();
             else
                 first = document.getElementsByClassName("selected")[0];
         }
@@ -185,3 +203,43 @@ function createnode(){
     document.body.addEventListener('mousedown', startDragIfDraggable);
 
 }(document));
+
+function pressent(array, element){
+    var i, cap = array.length;
+    for (i=0; i < cap; i++){
+        if(array[i] == element)
+            return true;
+    }
+    return false;
+}
+
+function edgecheck(nod){
+    nodespassed.push(nod.id);
+    if(nodespassed.length == nodearray.length)
+        return true;
+    var i;
+    var cap = nod.edges.length;
+    for(i=0; i<cap; i++){
+        if(!pressent(nodespassed, nod.edges[i].nodes[0])){
+            if(edgecheck(nodearray[nod.edges[i].nodes[0]]))
+                return true;
+        }
+        if(!pressent(nodespassed, nod.edges[i].nodes[1])){
+            if(edgecheck(nodearray[nod.edges[i].nodes[1]]))
+                return true;
+        }
+    }
+    return false;
+}
+
+function connect(){
+    if(nodearray.length == 0)
+        alert("Add at least one node first");
+    else{
+        nodespassed.length = 0;
+        if(edgecheck(nodearray[0]))
+            alert("True");
+        else
+            alert("False");
+    }
+}
