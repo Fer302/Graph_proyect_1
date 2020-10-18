@@ -59,8 +59,7 @@ for(var k=0;k<this.numVertices;k++){
 
 var countnodes = 0
 var countedges = 0
-nodearray= []
-edgearray= []
+var weight = 0
 
 class node{
     constructor(){
@@ -80,11 +79,25 @@ class edge{
     }
 }
 
+var nodearray= []
+var edgearray= []
+
 function check(){
     if(!document.getElementById("add").checked){
         var nodes = document.getElementsByClassName("selected");
         nodes[0].classList.remove("selected");
     }
+}
+
+function update(){
+    weight = document.getElementById("num").value;
+    if(weight.length == 0){
+        weight = 0;
+    }
+    if(weight<0){
+        weight *= -1;
+    }
+    document.getElementById("w").innerHTML = "Weight = " +weight;
 }
 
 function createnode(){
@@ -98,24 +111,6 @@ function createnode(){
         document.body.appendChild(btn);
     }
 }
-
-  function createLine(x1, y1, x2, y2){
-    var length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-    var angle  = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-    var transform = 'rotate('+angle+'deg)';
-      var line = $('<div>')
-        .appendTo('#page')
-        .addClass('line')
-        .css({
-          'position': 'absolute',
-          'transform': transform
-        })
-        .width(length)
-        .offset({left: x1, top: y1});
-        alert("here");
-  
-    return line;
-  }
 
 (function (document) {
     'use strict';
@@ -144,7 +139,10 @@ function createnode(){
         var nodes = document.getElementsByClassName("selected");
         var node1 = document.getElementById(nodes[0].id);
         var node2 = document.getElementById(nodes[1].id);
-        createLine(node1.getBoundingClientRect().x, node1.getBoundingClientRect().y, node2.getBoundingClientRect().x, node2.getBoundingClientRect().y);
+        var dir = false;
+        if(document.getElementById("dir").checked)
+            dir = true;
+        edgearray.push(new edge(node1.id, node2.id, 0, dir));
         alert(node1.getBoundingClientRect().x);
         node1.classList.remove("selected");
         node2.classList.remove("selected");

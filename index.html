@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>Graphapp</title>
@@ -8,6 +8,12 @@
   </head>
   <body>
     <button onclick="createnode()">New node</button>
+    <form>
+      <label for="fname">Edge Weight:</label><br>
+      <input type="number" name="fname" id="num"><br>
+    </form>
+    <button onclick="update();"> update </button>
+    <h3 id="w">Weight = 0</h3>
     <input type="checkbox" id="add" onclick="check()">
     <label for="add">Add edges</label>
     <input type="checkbox" id="dir">
