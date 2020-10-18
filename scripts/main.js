@@ -83,6 +83,8 @@ var nodearray = []
 var edgearray = []
 var first // Node
 var nodespassed = [] 
+var matrix = new Array(0).fill(0).map(() => new Array(0).fill(0));
+var Column = []
 
 function check(){
     if(!document.getElementById("add").checked){
@@ -126,6 +128,7 @@ function createnode(){
         btn.id = count;
         btn.classList.add("node");
         document.body.appendChild(btn);
+        pathmatrix();
     }
 }
 
@@ -167,6 +170,7 @@ function createnode(){
         nodearray[node2.id].edges.push(edgearray[countedges-1]);
         node1.classList.remove("selected");
         node2.classList.remove("selected");
+        pathmatrix();
     }
 
     function addedgeself(){
@@ -211,6 +215,31 @@ function pressent(array, element){
             return true;
     }
     return false;
+}
+
+function pathmatrix(){
+    var div = document.getElementById("table");
+    var child = div.lastElementChild;  
+        while (child) { 
+            div.removeChild(child); 
+            child = div.lastElementChild; 
+        } 
+    var i, j, capn = nodearray.length, cape = edgearray.length;
+    matrix = new Array(capn).fill(0).map(() => new Array(capn).fill(0));
+    for(i=0; i<cape; i++){
+        matrix[edgearray[i].nodes[0]][edgearray[i].nodes[1]] = 1;
+        if(!edgearray[i].dir)
+            matrix[edgearray[i].nodes[1]][edgearray[i].nodes[0]] = 1;
+    }
+    for(i=0; i<capn; i++) {
+        var row = document.createElement('tr');
+        for(j=0; j<capn; j++){
+            var cell = document.createElement('td');
+            cell.innerHTML = matrix[i][j];
+            row.appendChild(cell);
+        }
+        div.appendChild(row);
+    }
 }
 
 function edgecheck(nod){
